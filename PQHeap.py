@@ -39,5 +39,31 @@ def heapExtractMax(A):
     A.heapsize = A.heapsize - 1
     maxHeapify(A,1)
     return maximum
+
+# Side 164
+def heapIncreaseKey(A,i,key):
+    if key < A[i]:
+        ValueError('new key is smaller than current key')
+    
+    A[i] = key
+
+    while i > 1 and A[Parent[i]] < A[i]
+        A[i], A[Parent(i)] = A[Parent(i)], A[i]
+        i = Parent(i)
+
+def maxHeapInsert(A,key):
+    A.heapsize = A.heapsize + 1
+    A[A.heapsize] = -infty
+    HeapIncreaseKey(A,A.heapsize,key)
+
+def extractMin(A):
+    # Fjerner det element med mindst prioritet i prioritetskøen A og returnerer det
+
+
+def insert(A,e):
+    # Indsætter elementet e i prioritetskøen A
+
+def createEmptyPQ():
+    # Returnerer en ny, tom prioritetskø (en tom liste)
   
 
