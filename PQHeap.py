@@ -2,6 +2,33 @@ Test
 
 hej
 
+# Side 152
+def Parent(i):
+    return i // 2
+
+def Left(i):
+    return 2*i
+
+def Right(i):
+    return 2*i + 1
+
+# Side 154
+def maxHeapify(A,i):
+    l = Left(i)
+    r = Right(i)
+
+    if (l <= A.heapsize and A[l] > A[i]):
+        largest = l
+    else largest = i
+
+    if (r <= A.heapsize and A[r] > A[largest]):
+        largest = r
+    
+    if largest != i:
+        A[i], A[largest] = A[largest], A[i]
+        maxHeapify(A,largest)
+
+
 def HeapMaximum(A):
     return A[1]
   
