@@ -26,18 +26,18 @@ def maxHeapify(A,i):
         A[i], A[largest] = A[largest], A[i]
         maxHeapify(A,largest)
 
-
-def HeapMaximum(A):
+# Side 163
+def heapMaximum(A):
     return A[1]
-  
-def HeapExtractMax(A):
+
+def heapExtractMax(A):
     if A.heapsize < 1:
         ValueError('Heap underflow')
     
-    max = A[1]
+    maximum = A[1]
     A[1] = A[A.heapsize]
     A.heapsize = A.heapsize - 1
-    MaxHeapify(A,1)
-    return max
+    maxHeapify(A,1)
+    return maximum
   
 
