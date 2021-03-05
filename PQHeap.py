@@ -56,6 +56,7 @@ def maxHeapInsert(A,key):
     A[A.heapsize] = -infty
     HeapIncreaseKey(A,A.heapsize,key)
 
+# Vores implementering
 def extractMin(A):
     # Fjerner det element med mindst prioritet i prioritetskøen A og returnerer det
 
