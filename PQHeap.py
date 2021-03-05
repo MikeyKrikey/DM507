@@ -47,7 +47,7 @@ def heapIncreaseKey(A,i,key):
     
     A[i] = key
 
-    while i > 1 and A[Parent[i]] < A[i]
+    while i > 1 and A[Parent[i]] < A[i]:
         A[i], A[Parent(i)] = A[Parent(i)], A[i]
         i = Parent(i)
 
