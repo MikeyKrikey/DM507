@@ -54,7 +54,7 @@ def heapIncreaseKey(A,i,key):
 def maxHeapInsert(A,key):
     A.heapsize = A.heapsize + 1
     A[A.heapsize] = -infty
-    HeapIncreaseKey(A,A.heapsize,key)
+    heapIncreaseKey(A,A.heapsize,key)
 
 # Vores implementering
 def extractMin(A):
