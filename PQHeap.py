@@ -1,6 +1,4 @@
-Test
 
-hej
 
 # Side 152
 def Parent(i):
