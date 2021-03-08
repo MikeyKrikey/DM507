@@ -1,5 +1,14 @@
 import math
 
+'''
+Gruppe:
+
+Stine Holz Meinhardt Gregersen, sgreg18
+Michael Kristensen, mickr19
+Hanna Bruun-Schmidt, habru19
+
+'''
+
 # Side 152 (skiftede til definerede)
 def Parent(i):
     return math.floor((i-1) / 2)
