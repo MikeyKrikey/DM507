@@ -32,6 +32,14 @@ Iterative-Tree-Search(x,k)
 """
 # Vores implementering af search
 def search(T,k):
+    if T[0] == None:
+        return False
+    if k == T[0][0]:
+        return True
+    if k < T[0][0]:
+        return search([T[0][1]], k)
+    else:
+        return search([T[0][2]], k)
     # Skal returnerer en boolean, der angiver om nøglen k er i træet T.
 
 """
@@ -58,6 +66,22 @@ Tree-Insert(T,z)
 """
 # vores implementering af insert
 def insert(T,k):
+    y = None 
+    k = [k, None, None]
+    x = T[0]
+    while x != None:
+        y = x
+        if k[0] < x[0]:
+            x = x[1]
+        else: 
+            x = x[2]
+    if y == None:
+        T[0] = k
+    elif k[0] < y[0]:
+        y[1] = k
+    else:
+        y[2] = k
+    
     # indsætter nøglen k i træet T.
 
 """
@@ -71,8 +95,26 @@ Inorder-Tree-Walk(x)
 """
 
 # vores implementering af inorder gennemløb (Træet skal ikke holdes balanceret)
-def orderedTraversal(T):
+def orderedTraversal(T, liste = []):
+    if T[0] != None:
+        orderedTraversal([T[0][1]], liste)
+        liste.append(T[0][0])
+        orderedTraversal([T[0][2]], liste)
+    return liste
     # returnerer en liste med nøglerne i træet T i sorteret orden (fremfor at printe dem på skærmen som i bogens pseudo-kode)
 
 def createEmptyDict():
+    return [None]
     # returnerer et nyt tomt træ
+
+T = createEmptyDict()
+insert(T, 2)
+insert(T, 2)
+insert(T, -9)
+insert(T, 5)
+insert(T, 4)
+insert(T, 1)
+insert(T, 100)
+insert(T, 19)
+print(T, search(T, 10))
+print(orderedTraversal(T))
