@@ -107,14 +107,4 @@ def createEmptyDict():
     return [None]
     # returnerer et nyt tomt træ
 
-T = createEmptyDict()
-insert(T, 2)
-insert(T, 2)
-insert(T, -9)
-insert(T, 5)
-insert(T, 4)
-insert(T, 1)
-insert(T, 100)
-insert(T, 19)
-print(T, search(T, 10))
-print(orderedTraversal(T))
+
