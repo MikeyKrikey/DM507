@@ -18,6 +18,7 @@ for line in sys.stdin:
     n = n+1
 
 liste = DictBinTree.orderedTraversal(dictionary)
+i = 0
 while i < n:
     print(liste[0])
-    n = n+1
+    i = i+1
