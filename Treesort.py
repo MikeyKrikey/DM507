@@ -20,5 +20,5 @@ for line in sys.stdin:
 liste = DictBinTree.orderedTraversal(dictionary)
 i = 0
 while i < n:
-    print(liste[0])
+    print(liste[i])
     i = i+1
