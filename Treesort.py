@@ -17,6 +17,7 @@ for line in sys.stdin:
     DictBinTree.insert(dictionary,int(float(line)))
     n = n+1
 
+print()
 liste = DictBinTree.orderedTraversal(dictionary)
 i = 0
 while i < n:
