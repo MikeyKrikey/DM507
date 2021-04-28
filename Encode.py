@@ -50,3 +50,4 @@ for i in numbers:
     for j in table:
         if i == j[0]:
             print(j[1])
+            break
