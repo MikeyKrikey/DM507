@@ -1,117 +1,66 @@
-# Note: When a BitReader is instantiated, it must be given as argument a file
-# object opened in binary reading mode ('rb'). When a BitWriter is
-# instantiated, it must be given as argument a file object opened in binary
-# writing mode ('wb').
+import bitIO
+import sys
 
-# Code is based on http://rosettacode.org/wiki/Bitwise_IO#Python, with changes
-# by Rolf Fagerberg.
+# Test program to exercise bitIO.BitReader and bitIO.BitWriter. Run it
+# on some small text file (containing at least 4 bytes) by
+# 
+#   python test.py infilename outfilename
+# 
+# This should copy the infile to outfile, while adding the character
+# '@' to the end of it (after any newline, if the file ends with
+# this), and along the way write some multi-digit integer to the
+# screen (read comments below to understand WHY this should be the
+# behavior).
 
-# Bits are represented by ints, which in Python can be thougth of as infinite
-# bitstrings of the form ...000001XXXXXXXXX (positive ints) or ...111110XXXXXXX
-# (negative ints). In all situations in the code below, some suffix (of length
-# 1, 8, or n) of such bitstrings is the bits in question.
+# Open input and output files, using binary mode (reading/writing bytes).
+infile = open(sys.argv[1], 'rb')
+outfile = open(sys.argv[2], 'wb')
 
-# The code is always passing from left to right in the sequence of bits,
-# e.g. when writing to/reading from a byte, or if writing n bits (i.e., these
-# will be the rigthmost n bits of the int supplied).
+# Create the BitReader/BitWriter using these files as input/output.
+bitstreamin = bitIO.BitReader(infile)
+bitstreamout = bitIO.BitWriter(outfile)
 
-# For writing, note that when flush() is called, a full byte will be written to
-# the file by right-filling the byte with 0's (because the accumulator is reset
-# to 0 (= ......0000000) after each write). This is the intended
-# functionality. If on the other hand flush() is not called after writing has
-# finished , the last bits written (up to 7) may be lost.
+# First read a full int (i.e., four bytes) from the input file using the
+# library method readint32bits.
+i = bitstreamin.readint32bits()
 
-# If a BitWriter is instantiated via a "with ... as ..." statement, flush()
-# will automatically be called (via the __exit__() method).
+# Print the value on screen (probably multi-digit integer, if run on a
+# textfile, since four bytes representing some chars are the bit pattern of
+# some 32 bit integer).
+print(i)
 
-class BitWriter(object): # "(object)" present to be Python2/3-agnostic
-    def __init__(self, f):
-        self.accumulator = 0 # the int building up to a full byte to be written
-        self.bcount = 0 # number of bits put in the accumulator so far
-        self.output = f # the file object we are writing to
-                        # (must be opened in binary mode)
+# Write the int again to output file (as same four bytes, so bytes should
+# appear again in output file exactly as they were in input file) using the
+# library method writeint32bits().
+bitstreamout.writeint32bits(i)
 
-    def __enter__(self):
-        return self
- 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.flush()
- 
-    def __del__(self):
-        try:
-            self.flush()
-        except ValueError:   # I/O operation on closed file.
-            pass
- 
-    def close(self):
-        self.flush()
-        self.output.close()
-        
-    def writebit(self, bit):
-        # if a full byte has accumulated, write it out to file
-        # and reset accumulater to all 0's:
-        if self.bcount == 8:
-            self.flush()
-        # add the new bit to the accumulator:
-        if bit > 0:
-            self.accumulator |= 1 << 7-self.bcount
-        self.bcount += 1
- 
-    def _writebits(self, bits, n):
-        while n > 0:
-            self.writebit(bits & 1 << n-1)
-            n -= 1
- 
-    def writeint32bits(self, intvalue):
-        self._writebits(intvalue, 32)
+# Now read the last bits of input file. Do this bit by bit using the library
+# method readbit(). At the same time write them again on the output file using
+# the library method writebit(). Note the while-expression going through the
+# file until no more bits are available (signaled by readsucces() returning
+# false).
+while True:
+    x = bitstreamin.readbit()
+    if not bitstreamin.readsucces():  # End-of-file?
+        break
+    bitstreamout.writebit(x)
 
-    def flush(self):
-        # Writes current accumulator to file, then
-        # resets accumulator to all 0's.
-        if self.bcount: # but only if any bits have accumulated
-            self.output.write(bytearray([self.accumulator]))
-            self.accumulator = 0
-            self.bcount = 0
- 
-class BitReader(object): # "(object)" present to be Python2/3-agnostic
-    def __init__(self, f):
-        self.input = f # the file object we are reading from
-                       # (must be opened in binary mode)
-        self.accumulator = 0 # cache of the last byte read
-        self.bcount = 0 # number of bits left unread in accumulator
-        self.read = 0 # Was last read succesful? [EOF or not?]
- 
-    def __enter__(self):
-        return self
- 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        pass
+# Write two bits MORE to output file. This will be padded by the library with
+# six 0 bits when closing and flushing the output stream, hence give the
+# character '@' (which in ASCII has pattern 01000000).
+#
+# NOTE: this is ONLY to illustrate the effect of writing a number of bits which
+# is not a multiple of eight. In Encode in the project, you should NOT add
+# these two bits. However, when writing Huffman codes, you may naturally end up
+# in a similar situation (because Huffman codes are not multiples of eight),
+# which you should be aware of (you must in Decode avoid reading the bits
+# padded by the library when closing the output stream in Encode).
+bitstreamout.writebit(0)
+bitstreamout.writebit(1)
 
-    def close(self):
-        self.input.close()
-        
-    def readsucces(self):
-        return self.read
-    
-    def readbit(self):
-        if not self.bcount: # if bcount == 0 [no unread bits in accumulator]
-            a = self.input.read(1)
-            if a: # if not EOF [EOF = attempt at reading returns empty list]
-                self.accumulator = ord(a) # int between 0 and 256, [note that
-                                          # ord works for byte objects]
-            self.bcount = 8 # number of bits available
-            self.read = len(a) # remember number of bytes read (0 => EOF)
-        # extract the (bcount-1)'th bit [the next bit] in the accumulator:
-        rv = (self.accumulator & (1 << self.bcount-1)) >> self.bcount-1
-        self.bcount -= 1 # move to next bit in accumulator
-        return rv
- 
-    def _readbits(self, n):
-        v = 0
-        while n > 0:
-            v = (v << 1) | self.readbit()
-            n -= 1
-        return v
+# Flush the BitWriter (automatically padding output with 0-bits until a full
+# number of bytes (i.e, a multiple of eight bits) have been written, as
+# described above) and close the files.
+bitstreamout.close()
+bitstreamin.close()
 
-    def readint32bits(self):
-        return self._readbits(32)
