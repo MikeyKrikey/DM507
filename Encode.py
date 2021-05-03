@@ -4,22 +4,23 @@ import PQHeap # Dette er gruppens PQHeap.py fra del I.
 import bitIO
 from Element import Element
 
-
-file = open(sys.argv[1], 'rb')
-freq = [0] * 256
-b = file.read(1)
-while b != b'':
-    freq[b[0]] += 1
-    b = file.read(1)
-file.close()
-
-pq = PQHeap.createEmptyPQ()
-
-for i in range(256):
-    PQHeap.insert(pq, Element(freq[i], [i]))
-
 n = 256
 
+#read file to create list of frequencies
+infile = open(sys.argv[1], 'rb')
+freq = [0] * n
+b = infile.read(1)
+while b != b'':
+    freq[b[0]] += 1
+    b = infile.read(1)
+infile.close()
+
+#use PQHeap to create pq for frequencies
+pq = PQHeap.createEmptyPQ()
+for i in range(n):
+    PQHeap.insert(pq, Element(freq[i], [i]))
+
+#create Huffman tree
 for i in range(0,n-1):
     x = PQHeap.extractMin(pq)
     y = PQHeap.extractMin(pq)
@@ -27,6 +28,7 @@ for i in range(0,n-1):
     PQHeap.insert(pq, z)
 tree = PQHeap.extractMin(pq).data
 
+#create table of codes from tree
 def orderedTraversal(tree, kode = "", table = []):
     if isinstance(tree[0], list):
         orderedTraversal(tree[0], kode + "0", table)
@@ -36,18 +38,24 @@ def orderedTraversal(tree, kode = "", table = []):
     return tree[0]
 table = []
 orderedTraversal(tree, "", table)
-print(table)
 
-file = open(sys.argv[1], 'rb')
-numbers = []
-b = file.read(1)
+#read file again for list of bits in inputfile
+infile = open(sys.argv[1], 'rb')
+bits = []
+b = infile.read(1)
 while b != b'':
-    numbers.append(b[0])
-    b = file.read(1)
-file.close()
+    bits.append(b[0])
+    b = infile.read(1)
+infile.close()
 
-for i in numbers:
+#write bits in terms of Huffman coding
+outfile = open(sys.argv[2], 'wb')
+bitstreamout = bitIO.BitWriter(outfile)
+for i in range(n):
+    bitstreamout.writeint32bits(freq[i])
+for i in bits:
     for j in table:
         if i == j[0]:
-            print(j[1])
-            break
+            for k in range(0, len(j[1])):
+                bitstreamout.writebit(int(j[1][k]))
+bitstreamout.close()
